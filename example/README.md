@@ -79,61 +79,65 @@ Certain Assumption is made for this door adapter template:
 
 if the user's door condition is same as above, user can directly edit the parameter of `config.yaml` file as below:
 
-    door:
-        name: "example_door1"                               # input the door name as you wish
-        api_endpoint: "https://door_endpoint_example/"      # API endpoint that would required to get from the API vendor/provider
-        header_key: "example_key"                           # depend of header key and value required by door API server
-        header_value: "example_header_value"                # depend of header key and value required by door API server
-        door_id: "example_door_id"                          # depend of header key and value required by door API server
+```yaml
+door:
+    name: "example_door1"                               # input the door name will display and called by rmf
+    api_endpoint: "https://door_endpoint_example/"      # API endpoint that would required to get from the API vendor/provider
+    header_key: "example_key"                           # depend of header key and value required by door API server
+    header_value: "example_header_value"                # depend of header key and value required by door API server
+    door_id: "example_door_id"                          # depend of header key and value required by door API server
+```
 
 ### Build Instruction
 1. Install all non-ROS dependencies of RMF packages
-    ```
-    sudo apt update && sudo apt install \
-        git cmake python3-vcstool curl \
-        qt5-default \
-        ignition-edifice \
-        -y
-    python3 -m pip install flask-socketio
-    sudo apt-get install python3-colcon*
-    ```
+```bash
+sudo apt update && sudo apt install \
+    git cmake python3-vcstool curl \
+    qt5-default \
+    ignition-edifice \
+    -y
+python3 -m pip install flask-socketio
+sudo apt-get install python3-colcon*
+```
 
 2. Build RMF
-    ```
-    mkdir -p ~/rmf_ws/src
-    cd ~/rmf_ws
-    wget https://raw.githubusercontent.com/open-rmf/rmf/main/rmf.repos
-    vcs import src < rmf.repos
-    cd ~/rmf_ws
-    rosdep install --from-paths src --ignore-src --rosdistro foxy -yr
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
-    ```
+```bash
+mkdir -p ~/rmf_ws/src
+cd ~/rmf_ws
+wget https://raw.githubusercontent.com/open-rmf/rmf/main/rmf.repos
+vcs import src < rmf.repos
+cd ~/rmf_ws
+rosdep install --from-paths src --ignore-src --rosdistro foxy -yr
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+```
 
 3. Build door_adapter
-    ```
-    mkdir -p ~/rmf_door_ws/src
-    git clone https://github.com/open-rmf/door_adapter_template.git
-    source /opt/ros2/foxy/setup.bash
-    source ~/rmf_ws/install/setup.bash
-    cd ~/rmf_door_ws
-    colcon build
-    ```
+```bash
+cd ~
+git clone https://github.com/open-rmf/door_adapter_template.git
+mkdir -p ~/rmf_door_ws/src
+cp -r ~/door_adapter_template/example ~/rmf_door_ws/src
+source /opt/ros2/foxy/setup.bash
+source ~/rmf_ws/install/setup.bash
+cd ~/rmf_door_ws
+colcon build
+```
 
 4. Usage
 
     a) Run Mock door Server
-    ```
+    ```bash
     cd ~/rmf_door_ws
-    python src/door_adapter_template/door_adapter/mock_door_server.py
+    python src/example/door_adapter/mock_door_server.py
     ```
 
     b) Open another **terminal** and run
-    ```
+    ```bash
     cd ~/rmf_door_ws
     source /opt/ros2/foxy/setup.bash
     source ~/rmf_ws/install/setup.bash
     source install/setup.bash
-    ros2 run door_adapter door_adapter -c src/door_adapter_template/config.yaml
+    ros2 run door_adapter door_adapter -c src/example/config.yaml
     ```
 
 

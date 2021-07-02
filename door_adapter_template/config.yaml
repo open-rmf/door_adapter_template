@@ -2,15 +2,6 @@
 # RMF door parameters
 
 ### template ###
-# door:
-#   name: "example_door1"
-#   api_endpoint: "https://door_endpoint_example/"
-#   header_key: "example_key"
-#   header_value: "example_header_value"
-#   door_id: "example_door_id"
-
-
-### config file communicate with mock_door_server.py
 door:
   name: "example_door"
   api_endpoint: "http://127.0.0.1:8888/"

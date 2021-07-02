@@ -4,7 +4,7 @@ import urllib3
 import socket
 import time
 
-class ClientAPI:
+class DoorClientAPI:
     def __init__(self,url,api_key,api_value,door_id):
         self.url = url
         self.header = {api_key:api_value}
