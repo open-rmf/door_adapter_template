@@ -69,3 +69,4 @@ class DoorClientAPI:
         except (socket.gaierror, urllib3.exceptions.NewConnectionError, urllib3.exceptions.MaxRetryError, requests.exceptions.HTTPError ,requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
             print("Connection Error. "+str(e))
             return 4
+            
