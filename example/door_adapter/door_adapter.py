@@ -1,10 +1,7 @@
 import sys
-import math
 import yaml
 import argparse
 
-import socket
-import urllib3
 import time
 import threading
 
@@ -119,4 +116,3 @@ def main(argv=sys.argv):
 
 if __name__ == '__main__':
     main(sys.argv)
-    

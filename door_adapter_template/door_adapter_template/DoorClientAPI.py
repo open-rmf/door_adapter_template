@@ -3,6 +3,7 @@ import json
 import urllib3
 import socket
 import time
+from rmf_door_msgs.msg import DoorMode
 
 class DoorClientAPI:
     def __init__(self,url,api_key,api_value,door_id):
@@ -36,13 +37,20 @@ class DoorClientAPI:
         ## ------------------------ ##
         return False
 
+    def close_door(self):
+        ''' Return True if the door API server is successful receive open door command'''
+        ## ------------------------ ##
+        ## IMPLEMENT YOUR CODE HERE ##
+        ## ------------------------ ##
+        return False
+
     def get_mode(self):
         ''' Return the door status with reference rmf_door_msgs. 
-            Return 0 when door status is closed.
-            Return 1 when door status is moving.
-            Return 2 when door status is open.
-            Return 3 when door status is offline.
-            Return 4 when door status is unknown'''
+            Return DoorMode.MODE_CLOSED when door status is closed.
+            Return DoorMode.MODE_MOVING when door status is moving.
+            Return DoorMode.MODE_OPEN when door status is open.
+            Return DoorMode.MODE_OFFLINE when door status is offline.
+            Return DoorMode.MODE_UNKNOWN when door status is unknown'''
         ## ------------------------ ##
         ## IMPLEMENT YOUR CODE HERE ##
         ## ------------------------ ##
