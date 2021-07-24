@@ -22,10 +22,15 @@ class DoorAdapter(Node):
         self.door_name = config_yaml['door']['name']
         self.door_close_feature = config_yaml['door']['door_close_feature']
         self.door_signal_period = config_yaml['door']['door_signal_period']
+        
         url = config_yaml['door']['api_endpoint']
         api_key = config_yaml['door']['header_key']
         api_value = config_yaml['door']['header_value']
         door_id = config_yaml['door']['door_id']
+        
+        door_pub = config_yaml['door_publisher']
+        door_sub = config_yaml['door_subscriber']
+
         self.api = DoorClientAPI(url,api_key,api_value,door_id)
        
         assert self.api.connected, "Unable to establish connection with door"
@@ -37,13 +42,13 @@ class DoorAdapter(Node):
         self.check_status = False
         
         self.door_states_pub = self.create_publisher(
-            DoorState, 'door_states', 1)
+            DoorState, door_pub['topic_name'], 10)
 
         self.door_request_sub = self.create_subscription(
-            DoorRequest, 'adapter_door_requests', self.door_request_cb, 1)
+            DoorRequest, door_sub['topic_name'], self.door_request_cb, 10)
 
         self.periodic_timer = self.create_timer(
-            1.0, self.time_cb)
+            door_pub['door_state_publish_frequency'], self.time_cb)
 
     def door_open_command_request(self, period=3.0):
         # assume API doesn't have close door API
@@ -86,7 +91,7 @@ class DoorAdapter(Node):
                 if self.door_close_feature:
                     self.api.open_door()
                 else:
-                    t = threading.Thread(target = self.door_command_request, args=(self.door_signal_period))
+                    t = threading.Thread(target = self.door_open_command_request, args=(self.door_signal_period,))
                     t.start()
             elif msg.requested_mode.value == DoorMode.MODE_CLOSED:
                 # close door implementation

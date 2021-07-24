@@ -6,7 +6,7 @@ import time
 import threading
 
 import rclpy
-from door_adapter.DoorClientAPI import DoorClientAPI
+from DoorClientAPI import DoorClientAPI
 from rclpy.node import Node
 from rclpy.time import Time
 from rmf_door_msgs.msg import DoorRequest, DoorState, DoorMode
@@ -20,47 +20,55 @@ class DoorAdapter(Node):
 
         # Get value from config file
         self.door_name = config_yaml['door']['name']
+        self.door_close_feature = config_yaml['door']['door_close_feature']
+        self.door_signal_period = config_yaml['door']['door_signal_period']
+        
         url = config_yaml['door']['api_endpoint']
         api_key = config_yaml['door']['header_key']
         api_value = config_yaml['door']['header_value']
         door_id = config_yaml['door']['door_id']
+        
+        door_pub = config_yaml['door_publisher']
+        door_sub = config_yaml['door_subscriber']
 
-        self.api = ClientAPI(url,api_key,api_value,door_id)
+        self.api = DoorClientAPI(url,api_key,api_value,door_id)
+       
         assert self.api.connected, "Unable to establish connection with door"
-
+        
         # default door state - closed mode
-        self.door_mode = 0 
+        self.door_mode = DoorMode.MODE_CLOSED
         # open door flag
         self.open_door = False
         self.check_status = False
         
         self.door_states_pub = self.create_publisher(
-            DoorState, 'door_states', 1)
+            DoorState, door_pub['topic_name'], 10)
 
         self.door_request_sub = self.create_subscription(
-            DoorRequest, 'adapter_door_requests', self.door_request_cb, 1)
+            DoorRequest, door_sub['topic_name'], self.door_request_cb, 10)
 
         self.periodic_timer = self.create_timer(
-            1.0, self.time_cb)
+            door_pub['door_state_publish_frequency'], self.time_cb)
 
-    def keep_door_open(self):
+    def door_open_command_request(self, period=3.0):
         # assume API doesn't have close door API
         # Once the door command is posted to the door API,
-        # the door will be opened and then close after 5 secs
+        # the door will be opened and then close after 5 secs    
         while self.open_door:
             success = self.api.open_door()
             if success:
                 self.get_logger().info(f"Request to open door [{self.door_name}] is successful")
             else:
                 self.get_logger().warning(f"Request to open door [{self.door_name}] is unsuccessful")
-            time.sleep(3.0)
+            time.sleep(period)
 
     def time_cb(self):
         if self.check_status:
             self.door_mode = self.api.get_mode()
             # when door request is to close door and the door state is close
             # will assume the door state is close until next door open request
-            if self.door_mode == 0 and not self.open_door:
+            # This implement to reduce the number of API called
+            if self.door_mode == DoorMode.MODE_CLOSED and not self.open_door:
                 self.check_status = False
         state_msg = DoorState()
         state_msg.door_time = self.get_clock().now().to_msg()
@@ -80,12 +88,17 @@ class DoorAdapter(Node):
                 # open door implementation
                 self.open_door = True
                 self.check_status = True
-                t = threading.Thread(target = self.keep_door_open)
-                t.start()
+                if self.door_close_feature:
+                    self.api.open_door()
+                else:
+                    t = threading.Thread(target = self.door_open_command_request, args=(self.door_signal_period,))
+                    t.start()
             elif msg.requested_mode.value == DoorMode.MODE_CLOSED:
                 # close door implementation
-                self.get_logger().info('Close Command to door received')
                 self.open_door = False
+                self.get_logger().info('Close Command to door received')
+                if self.door_close_feature:
+                    self.api.close_door()
             else:
                 self.get_logger().error('Invalid door mode requested. Ignoring...')
 
