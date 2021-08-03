@@ -16,4 +16,4 @@ door_subscriber:
 
 door_publisher:
   topic_name: "door_states"
-  door_state_publish_frequency: 1
+  door_state_publish_period: 1.0 # Seconds

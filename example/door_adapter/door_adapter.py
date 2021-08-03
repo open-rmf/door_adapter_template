@@ -22,6 +22,7 @@ class DoorAdapter(Node):
         self.door_name = config_yaml['door']['name']
         self.door_close_feature = config_yaml['door']['door_close_feature']
         self.door_signal_period = config_yaml['door']['door_signal_period']
+        self.door_state_publish_period = config_yaml['door_publisher']['door_state_publish_period']
         
         url = config_yaml['door']['api_endpoint']
         api_key = config_yaml['door']['header_key']
@@ -48,9 +49,9 @@ class DoorAdapter(Node):
             DoorRequest, door_sub['topic_name'], self.door_request_cb, 10)
 
         self.periodic_timer = self.create_timer(
-            door_pub['door_state_publish_frequency'], self.time_cb)
+            self.door_state_publish_period, self.time_cb)
 
-    def door_open_command_request(self, period=3.0):
+    def door_open_command_request(self):
         # assume API doesn't have close door API
         # Once the door command is posted to the door API,
         # the door will be opened and then close after 5 secs    
@@ -60,7 +61,7 @@ class DoorAdapter(Node):
                 self.get_logger().info(f"Request to open door [{self.door_name}] is successful")
             else:
                 self.get_logger().warning(f"Request to open door [{self.door_name}] is unsuccessful")
-            time.sleep(period)
+            time.sleep(self.door_signal_period)
 
     def time_cb(self):
         if self.check_status:
@@ -91,7 +92,7 @@ class DoorAdapter(Node):
                 if self.door_close_feature:
                     self.api.open_door()
                 else:
-                    t = threading.Thread(target = self.door_open_command_request, args=(self.door_signal_period,))
+                    t = threading.Thread(target = self.door_open_command_request)
                     t.start()
             elif msg.requested_mode.value == DoorMode.MODE_CLOSED:
                 # close door implementation
