@@ -1,20 +1,19 @@
-import requests
-import json
-import urllib3
-import socket
 import time
 from rmf_door_msgs.msg import DoorMode
 
 class DoorClientAPI:
-    def __init__(self,url,api_key,api_value,door_id):
-        self.url = url
-        self.header = {api_key:api_value}
-        self.data = {"id": door_id}
+    def __init__(self, node, config):
+        self.name = 'rmf_door_adapter'
+        self.timeout = 5  # seconds
+        self.debug = False
+        self.connected = False
+        self.node = node
+        self.config = config  # use this config to establish connection
 
         count = 0
         self.connected = True
         while not self.check_connection():
-            if count >= 5:
+            if count >= self.timeout:
                 print("Unable to connect to door client API.")
                 self.connected = False
                 break
@@ -30,21 +29,21 @@ class DoorClientAPI:
         ## ------------------------ ##
         return False
 
-    def open_door(self):
+    def open_door(self, door_id):
         ''' Return True if the door API server is successful receive open door command'''
         ## ------------------------ ##
         ## IMPLEMENT YOUR CODE HERE ##
         ## ------------------------ ##
         return False
 
-    def close_door(self):
+    def close_door(self, door_id):
         ''' Return True if the door API server is successful receive open door command'''
         ## ------------------------ ##
         ## IMPLEMENT YOUR CODE HERE ##
         ## ------------------------ ##
         return False
 
-    def get_mode(self):
+    def get_mode(self, door_id):
         ''' Return the door status with reference rmf_door_msgs. 
             Return DoorMode.MODE_CLOSED when door status is closed.
             Return DoorMode.MODE_MOVING when door status is moving.
