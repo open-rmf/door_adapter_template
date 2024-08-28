@@ -4,13 +4,14 @@
 ### template ###
 doors:
   "door_1":  # door name and id
-    door_close_feature: False
-    door_signal_period: 3.0 # Seconds
-    enable_check_status: False # Whether to keep checking door state when there are no requests
+    door_auto_closes: True # Set to True if door remains closed until requested open, and automatically closes if it does not receive subsequent open requests.
+    door_signal_period: 3.0 # Time taken for door signal to be effective, in seconds.
+    continuous_status_polling: False # Whether to keep checking door state when there are no requests
+    # NOTE: door_close_feature is [DEPRECATED], use door_auto_closes instead
   "door_2":  # door name and id
-    door_close_feature: False
-    door_signal_period: 3.0 # Seconds
-    enable_check_status: False # Whether to keep checking door state when there are no requests
+    door_auto_closes: True # Set to True if door remains closed until requested open, and automatically closes if it does not receive subsequent open requests.
+    door_signal_period: 3.0 # # Time taken for door signal to be effective, in seconds.
+    continuous_status_polling: False # Whether to keep checking door state when there are no requests
 
 door_subscriber:
   topic_name: "adapter_door_requests"
