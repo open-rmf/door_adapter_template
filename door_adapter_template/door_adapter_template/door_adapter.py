@@ -52,7 +52,7 @@ class DoorAdapter(Node):
                 self.doors[door_id] = Door(door_id,
                                            door_data['door_close_feature'],
                                            door_data['door_signal_period'],
-                                           door_data.get('enable_check_status', None))
+                                           door_data.get('enable_check_status', False))
 
         self.door_states_pub = self.create_publisher(
             DoorState, door_pub['topic_name'], 100)
