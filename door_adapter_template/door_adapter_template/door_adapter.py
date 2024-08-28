@@ -49,8 +49,16 @@ class DoorAdapter(Node):
             # Keep track of doors
             self.doors = {}
             for door_id, door_data in config_yaml['doors'].items():
+                # We support both door_auto_closes and the deprecated
+                # door_close_feature for backward compatibility
+                auto_close = door_data.get('door_auto_closes', None)
+                if auto_close is None:
+                    if 'door_close_feature' in door_data:
+                        auto_close = not door_data['door_close_feature']
+                assert auto_close is not None
+
                 self.doors[door_id] = Door(door_id,
-                                           door_data['door_auto_closes'],
+                                           auto_close,
                                            door_data['door_signal_period'],
                                            door_data.get('continuous_status_polling', False))
 
