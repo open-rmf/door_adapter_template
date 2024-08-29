@@ -2,14 +2,16 @@
 # RMF door parameters
 
 ### template ###
-door:
-  name: "example_door"
-  api_endpoint: "http://127.0.0.1:8888/"
-  header_key: "example_key"
-  header_value: "example_header_value"
-  door_id: "example_door_id"
-  door_signal_period: 3.0 # Seconds
-  door_close_feature: False 
+doors:
+  "door_1":  # door name and id
+    door_auto_closes: True # Set to True if door remains closed until requested open, and automatically closes if it does not receive subsequent open requests.
+    door_signal_period: 3.0 # Time taken for door signal to be effective, in seconds.
+    continuous_status_polling: False # Whether to keep checking door state when there are no requests
+    # NOTE: door_close_feature is [DEPRECATED], use door_auto_closes instead
+  "door_2":  # door name and id
+    door_auto_closes: True # Set to True if door remains closed until requested open, and automatically closes if it does not receive subsequent open requests.
+    door_signal_period: 3.0 # # Time taken for door signal to be effective, in seconds.
+    continuous_status_polling: False # Whether to keep checking door state when there are no requests
 
 door_subscriber:
   topic_name: "adapter_door_requests"
@@ -17,3 +19,10 @@ door_subscriber:
 door_publisher:
   topic_name: "door_states"
   door_state_publish_period: 1.0 # Seconds
+
+mock: False
+
+# Sample creds:
+api_endpoint: "http://127.0.0.1:8888/"
+header_key: "example_key"
+header_value: "example_header_value"

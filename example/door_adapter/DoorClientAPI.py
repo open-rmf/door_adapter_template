@@ -1,19 +1,22 @@
 import requests
-import json
 import urllib3
 import socket
 import time
+from rmf_door_msgs.msg import DoorMode
 
 class DoorClientAPI:
-    def __init__(self,url,api_key,api_value,door_id):
-        self.url = url
-        self.header = {api_key:api_value}
-        self.data = {"id": door_id}
+    def __init__(self, node, config):
+        self.name = 'rmf_door_adapter'
+        self.timeout = 5  # seconds
+        self.debug = False
+        self.connected = False
+        self.node = node
+        self.config = config  # use this config to establish connection
 
         count = 0
         self.connected = True
         while not self.check_connection():
-            if count >= 5:
+            if count >= self.timeout:
                 print("Unable to connect to door client API.")
                 self.connected = False
                 break
@@ -32,9 +35,9 @@ class DoorClientAPI:
             print(f"Connection Error: {e}")
             return False
 
-    def open_door(self):
+    def open_door(self, door_id):
         try:
-            response = requests.post(url=self.url+"/door/remoteopen",headers=self.header, json=self.data, timeout=1.0)
+            response = requests.post(url=self.url+f"/door/remoteopen/{door_id}",headers=self.header, json=self.data, timeout=1.0)
             if response:
                 result = response.json()["body"]
                 if (result.get("result") is not None):
@@ -49,24 +52,23 @@ class DoorClientAPI:
             print("Connection Error. "+str(e))
             return False
 
-    def get_mode(self):
+    def get_mode(self, door_id):
         try:
-            response = requests.post(url=self.url+"/door/status", headers=self.header, json=self.data, timeout=1.0) 
+            response = requests.post(url=self.url+f"/door/status/{door_id}", headers=self.header, json=self.data, timeout=1.0) 
             if response:
                 state = response.json().get("body").get("doorState")
                 if state is None:
-                    return 4
+                    return DoorMode.MODE_UNKNOWN
                 elif state == "closed":
-                    return 0
+                    return DoorMode.MODE_CLOSED
                 elif state == "betweenOpenandClosed ":
-                    return 1
+                    return DoorMode.MODE_MOVING
                 elif state == "open":
-                    return 2
+                    return DoorMode.MODE_OPEN
                 elif state == "OFFLINE":
-                    return 3
+                    return DoorMode.MODE_OFFLINE
             else:
                 return 4
         except (socket.gaierror, urllib3.exceptions.NewConnectionError, urllib3.exceptions.MaxRetryError, requests.exceptions.HTTPError ,requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
             print("Connection Error. "+str(e))
-            return 4
-            
+            return DoorMode.MODE_UNKNOWN
