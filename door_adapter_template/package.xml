@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>door_adapter</name>
+  <name>door_adapter_template</name>
   <version>0.0.0</version>
   <description>A template for an RMF door adapter</description>
-  <maintainer email=""></maintainer>
+  <maintainer email="gary.bey@kabam.ai"></maintainer>
   <license>Apache License 2.0</license>
 
   <exec_depend>rmf_door_msgs</exec_depend>

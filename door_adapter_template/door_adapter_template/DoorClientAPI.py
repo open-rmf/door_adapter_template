@@ -3,7 +3,7 @@ from rmf_door_msgs.msg import DoorMode
 
 class DoorClientAPI:
     def __init__(self, node, config):
-        self.name = 'rmf_door_adapter'
+        self.name = 'door_adapter_template'
         self.timeout = 5  # seconds
         self.debug = False
         self.connected = False
