@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'door_adapter'
+package_name = 'door_adapter_template'
 
 setup(
     name=package_name,
